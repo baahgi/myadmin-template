@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Admin template</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"/>
+    
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+
+
+    <style>
+        html { scroll-behavior: smooth;  }
+
+        body{
+            background-color: #DFDBE5;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        }
+    </style>
+
+</head>
+<body class="font-sans antialiased bg-gray-50">
+
+
+        <header class="fixed top-0 left-0 right-0 items-cente">
+            <nav class="w-full" 
+            x-data="{
+                sidebarDropdown: false,
+                navbarOpen: false,
+                profileIconOpen: false,
+                settingsOpen: false,
+                projectsOpen: false, 
+                searchBar: false
+               }"
+            >
+                <div class="flex items-center justify-between w-full px-6 py-2 bg-gray-200">         
+                    <div class="flex items-center justify-center">
+                        <img src="/asset/img/logo.png" class="object-contain w-10 h-10 rounded-md " alt="logo"> 
+                    </div>
+                    <!-- search button-->
+                    <div class="flex items-center space-x-4">
+                        <button @click="searchBar = ! searchBar" class="font-medium focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button> 
+                        <!-- show only on small screens -->
+                        <button @click="navbarOpen = !navbarOpen" class="font-medium focus:outline-none lg:hidden"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        </button>
+        
+                        <!-- show this nav on large screen -->
+                        <div class="relative items-center hidden space-x-6 text-gray-700 lg:flex">
+                            <div class="">
+                                <button @click="settingsOpen = ! settingsOpen" class="flex items-center focus:outline-none">
+                                <span>Settings</span> 
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg> 
+                                </button>                          
+                            </div>
+                            <div>
+                                <button @click="projectsOpen = ! projectsOpen" class="flex items-center focus:outline-none">
+                                <span>Projects</span> 
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg> 
+                                </button>  
+                            </div>
+                            <div>
+                                <button class="relative flex items-center focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg> 
+                                    <span class="absolute top-0 px-1 text-xs text-white bg-red-500 rounded-full -right-1">3</span>
+                                </button>     
+                            </div>
+                            <div class="">
+                                <button @click="profileIconOpen = ! profileIconOpen" class=" focus:outline-none">
+                                    <img src="/asset/img/logo.png" alt="profile picture" 
+                                    class="object-cover w-10 h-10 rounded-full"
+                                    >
+                                </button>
+                            </div>
+        
+                            <!-- settins dropdown  -->
+                            <div 
+                                x-show="settingsOpen" 
+                                @click.outside="settingsOpen = false" 
+                                x-transition
+                                style="display: none;"
+                                class="absolute z-20 w-64 bg-gray-100 border rounded-lg shadow-lg -left-4 top-14">
+                                <div class="px-4 py-5 space-y-2 text-center bg-gray-700 rounded-t-lg">
+                                    <h2 class="text-xl font-bold text-gray-100">Overview</h2>
+                                    <p class="text-sm text-gray-300">Dropdown menus for everyone</p>
+                                </div>
+                            
+        
+                                <div class="flex-col py-4">
+                                    <h2 class="px-4 text-sm font-semibold text-blue-600 uppercase">Key Figure</h2>
+                                    <a href="" class="block px-4 mt-4 text-sm hover:bg-gray-300">Service Calender</a>
+                                    <a href="" class="block px-4 mt-4 text-sm hover:bg-gray-300">Knowledge base</a>
+                                    <a href="" class="block px-4 mt-4 text-sm hover:bg-gray-300">Accounts</a>
+                                    
+                                </div>
+                                    <div class="p-4 mt-4 border-t border-gray-300">
+                                        <button class="px-4 py-1 text-sm tracking-tight text-red-100 bg-red-600 rounded-md shadow hover:bg-red-700">Cancel</button>
+                                    </div>
+                            </div>
+                            <!-- projects dropdown  -->
+                            <div 
+                                x-show="projectsOpen" 
+                                @click.outside="projectsOpen = false" 
+                                x-transition
+                                style="display: none;"
+                                class="absolute right-0 z-20 border rounded-lg shadow-lg bg-green-50 w-80 top-14">
+                                <div class="px-4 py-5 space-y-3 bg-green-500 rounded-t-lg">
+                                    <h2 class="text-xl font-bold text-green-100">Overview</h2>
+                                    <p class="text-sm text-green-100">Dropdown menus for everyone</p>
+                                    <div class="flex items-center space-x-4">
+                                        <button class="inline-block px-2 py-1 text-sm tracking-tight text-gray-100 bg-gray-800 rounded focus:outline-none">
+                                            Settings
+                                        </button>
+                                        <button class="inline-block px-2 py-1 text-sm tracking-tight bg-yellow-400 rounded focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            
+        
+                                <div class="flex-col px-2 py-4 space-y-2">
+                                    <div class="flex items-center px-2 py-1 space-x-2 rounded-md hover:bg-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                        </svg>
+                                        <a href="" class="inline-block text-sm ">Service Calender</a>
+                                    </div>
+                                    <div class="flex items-center px-2 py-1 space-x-2 rounded-md hover:bg-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                        </svg>
+                                        <a href="" class="inline-block text-sm ">App development</a>
+                                    </div>
+                                    <div class="flex items-center px-2 py-1 space-x-2 rounded-md hover:bg-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                        </svg>
+                                        <a href="" class="inline-block text-sm ">Icon Design</a>
+                                    </div>
+                                    <div class="flex items-center px-2 py-1 space-x-2 rounded-md hover:bg-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                        </svg>
+                                        <a href="" class="inline-block text-sm ">Service Calender</a>
+                                    </div>
+                                    
+                                </div>
+                                    
+                            </div>
+                            <!-- profile dropdown -->
+                            <div 
+                                x-show="profileIconOpen" 
+                                @click.outside="profileIconOpen = false" 
+                                x-transition 
+                                style="display: none;"
+                                class="absolute right-0 z-20 bg-gray-100 border border-gray-700 rounded-lg w-96 top-14">
+                                <div class="flex items-center justify-between px-4 py-5 space-x-4 border-b border-gray-500">
+                                    <img class="object-cover object-center w-10 h-10 border border-gray-500 rounded-full" src=".././assets/g-logo.png" alt="profile pic">
+                                    <div>
+                                        <h3 class="font-bold">My Fullname</h3>
+                                        <p class="mt-1 text-sm text-gray-600">A short profile description</p>
+                                    </div>
+                                    <button class="px-4 py-2 text-sm text-gray-100 bg-gray-800 rounded-full hover:bg-gray-900">Logout</button>
+                                </div>
+                                <div class="p-4">
+                                    <h2 class="font-medium text-gray-500">Activity</h2>
+                                    <div class="flex items-center justify-between mt-6 text-sm">
+                                        <p >Chat</p>
+                                        <span class="px-2 py-px text-xs font-semibold text-gray-100 bg-gray-800 rounded-full">5</span>
+                                    </div>
+                                    <div class="mt-4">
+                                        <p>Recover Password</p>
+                                    </div>
+                                    <h2 class="mt-4 font-medium text-gray-500">My Account</h2>
+                                </div>
+        
+                                <div class="flex py-4">
+                                    <div class="flex-col flex-1 p-2 space-y-4 border border-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <p class="text-center">Message Inbox</p>
+                                    </div>
+                                    <div class="flex-col flex-1 p-2 space-y-4 border border-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <p class="text-center">Message Inbox</p>
+                                    </div>
+                                </div>
+                                    <div class="flex items-center justify-center p-4 mt-4">
+                                        <button class="px-6 py-2 tracking-tight text-gray-100 bg-gray-800 rounded-md hover:bg-gray-900">Open Message</button>
+                                    </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- searchbar here -->
+                <div 
+                    x-show="searchBar" 
+                    x-transition
+                    style="display: none;"
+                    @click.outside="searchBar = false"
+                
+                class="absolute flex justify-center w-full mt-2 lg:ml-20">
+                    <button @click="searchBar = false" class="fixed inset-0 w-full h-full bg-gray-100 opacity-50 lg:hidden"></button>
+                    <div class="w-[95%] mx-auto absolute lg:w-[70%]">
+                        <div class="p-3 bg-gray-100 rounded-md shadow-md">
+                            <div class="flex space-x-2">
+                                <input type="search" name="" id=""
+                                class="w-full px-4 py-2 text-sm placeholder-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500"
+                                placeholder="Search..."
+                                >   
+                                <button class="px-2 text-sm font-medium text-gray-100 bg-gray-800 rounded-md hover:bg-gray-600">Search</button>     
+                            </div>
+                            <ul class="hidden m-4 space-y-3 font-medium">
+                                <li class="px-1 py-1 text-sm border-b rounded-lg hover:text-gray-500">
+                                    <div class="overflow-y-auto">
+                                        <a href="" class="">
+                                            <div class="flex">
+                                                <div class="flex flex-col ">
+                                                    <span class="text-gray-500 ">Consgnno:</span> 
+                                                    <span class="text-gray-500 ">From:</span> 
+                                                    <span class="text-gray-500 ">To:</span>   
+                                                    <span class="text-gray-500 ">Phone</span>
+                                                   
+                                                </div>
+                                                <div class="flex flex-col ml-6">
+                                                    <span class="whitespace-nowrap">23433435444</span>
+                                                    <span class="whitespace-nowrap">Ameyaw Margin to om memmd the poles </span>
+                                                    <span class="whitespace-nowrap">Justice</span> 
+                                                    <span class="text-xs whitespace-nowrap">22588458447</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </li>                                   
+                                <li class="px-1 py-1 text-sm border-b rounded-lg hover:text-gray-500">
+                                    <div class="overflow-y-auto">
+                                        <a href="" class="">
+                                            <div class="flex">
+                                                <div class="flex flex-col ">
+                                                    <span class="text-gray-500 ">Consgnno:</span> 
+                                                    <span class="text-gray-500 ">From:</span> 
+                                                    <span class="text-gray-500 ">To:</span>   
+                                                    <span class="text-gray-500 ">Phone</span>
+                                                   
+                                                </div>
+                                                <div class="flex flex-col ml-6">
+                                                    <span class="whitespace-nowrap">23433435444</span>
+                                                    <span class="whitespace-nowrap">Ameyaw  the poles </span>
+                                                    <span class="whitespace-nowrap">Justice</span> 
+                                                    <span class="text-xs whitespace-nowrap">22588458447</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </li>                                   
+                                <li class="px-1 py-1 text-sm border-b rounded-lg hover:text-gray-500">
+                                    <div class="overflow-y-auto">
+                                        <a href="" class="">
+                                            <div class="flex">
+                                                <div class="flex flex-col ">
+                                                    <span class="text-gray-500 ">Consgnno:</span> 
+                                                    <span class="text-gray-500 ">From:</span> 
+                                                    <span class="text-gray-500 ">To:</span>   
+                                                    <span class="text-gray-500 ">Phone</span>
+                                                   
+                                                </div>
+                                                <div class="flex flex-col ml-6">
+                                                    <span class="whitespace-nowrap">23433435444</span>
+                                                    <span class="whitespace-nowrap">Ameyaw Margin  </span>
+                                                    <span class="whitespace-nowrap">Justice</span> 
+                                                    <span class="text-xs whitespace-nowrap">22588458447</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </li>                                   
+                                                                   
+                            
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- mobile navvigation sidebar -->
+                <div 
+                    x-show="navbarOpen" 
+                    style="display: none;" 
+                    @click.outside="navbarOpen = false"
+                    x-transition:enter="transition ease-in-out duration-300 transform"
+                    x-transition:enter-start="-translate-x-full"
+                    x-transition:enter-end="translate-x-0"
+                    x-transition:leave="transition ease-in-out duration-300 transform"
+                    x-transition:leave-start="translate-x-0"
+                    x-transition:leave-end="-translate-x-full"
+
+                    class="lg:hidden">
+                    
+                    <button @click="navbarOpen = false" class="fixed inset-0 w-full h-full bg-gray-100 opacity-50 lg:hidden"></button>
+
+                    <div 
+                        class="absolute w-3/4 px-2 py-2 space-y-4 border border-gray-300 rounded-r-lg shadow bg-gray-50">
+                        <div class="flex justify-end">
+                            <button class="text-gray-600 focus:outline-none" x-on:click="navbarOpen = ! navbarOpen">
+                                <span class="sr-only">Close navigation</span>
+                                <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="text-sm">
+                            <h2 class="font-bold">Menu 1</h2>
+                            <ul class="flex flex-col mt-2 space-y-2 text-gray-600">
+                                <!-- active:  text-gray-800, font-bold, bg-gray-400 -->
+                                <a class="flex items-center px-2 py-1 space-x-2 font-medium text-gray-800 bg-gray-400 rounded"
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Dashboard</span>                        
+                                </a>
+                                <a class="flex items-center px-2 py-1 space-x-2 rounded hover:bg-gray-400 "
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>About</span>                        
+                                </a>
+                                <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Contact Us</span>                        
+                                </a>
+                                <li class="px-2 py-1 hover:text-gray-700 "
+                                >                        
+                                    <button @click="sidebarDropdown = ! sidebarDropdown" class="items-center block w-full space-x-2 focus:outline-none">
+                                        <span class="flex items-center justify-between">
+                                            <span class="flex space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                </svg>
+                                                <span>Dropdown</span>
+                                            </span>
+            
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    </button> 
+                                    <div class="mt-2 ml-5 border rounded" x-show="sidebarDropdown" 
+                                        x-transition.duration.500ms
+                                        x-on:click.outside="sidebarDropdown = false"
+                                    >
+                                        <ul class="ml-1 space-y-1.5">
+                                            <a href="" class="block p-px hover:bg-gray-300">Item 1</a>                                
+                                            <a href="" class="block p-px hover:bg-gray-300">Item 2</a>                                
+                                            <a href="" class="block p-px hover:bg-gray-300">Item 2 </a>                                
+                                        </ul>    
+                                    </div>          
+            
+                                </li>
+                                
+                            </ul>
+                        </div>
+            
+                        <div class="text-sm">
+                            <h2 class="font-bold">Menu 2</h2>
+                            <ul class="flex flex-col mt-2 space-y-2 text-gray-600">
+                                <a class="flex items-center px-2 py-1 space-x-2 font-medium text-gray-800 bg-gray-300 rounded"
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Dashboard</span>                        
+                                </a>
+                                <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>About</span>                        
+                                </a>
+                                <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                                href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Contact Us</span>                        
+                                </a>
+                                
+                            </ul>
+                        </div>
+                            <!-- at the buttom -->
+                        <div class="flex items-baseline pt-8 space-x-1">
+                            <button class="w-full py-1 text-sm text-gray-100 bg-gray-800 rounded hover:bg-gray-900">Login</button>
+                            <button class="w-full py-1 text-sm bg-gray-300 rounded hover:bg-gray-400">Sign Up</button>
+                        </div>
+                    </div>
+        
+                </div>
+            </nav>
+
+        </header>
+
+        
+        <!-- begining of side bar for big screens-->
+        <style>[hover-scrollbar] { overflow-x: 'visible'; overflow-y: hidden; } [hover-scrollbar]:hover { overflow-y: auto }</style>
+        <aside 
+            class="hidden lg:w-48 lg:p-4 lg:block fixed left-0 bottom-0 lg:top-[4rem] bg-gray-300" 
+            hover-scrollbar
+            x-data="{ dropdownOpen: false }"
+        >
+            <!-- <div class="flex items-center justify-center ">
+                <img src="/asset/img/logo.png" class="w-8 h-8 rounded-md lg:w-12 lg:h-12" alt="logo"> 
+            </div> -->
+            <div class="">
+                <div class="text-sm">
+                    <h2 class="font-bold">Menu 1</h2>
+                    <ul class="flex flex-col mt-2 space-y-2 text-gray-600">
+                        <!-- active:  text-gray-800, font-bold, bg-gray-400 -->
+                        <a class="flex items-center px-2 py-1 space-x-2 font-medium text-gray-800 bg-gray-400 rounded"
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Dashboard</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 rounded hover:bg-gray-400 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>About</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Contact Us</span>                        
+                        </a>
+                        <li class="px-2 py-1 hover:text-gray-700 ">                        
+                            <button @click="dropdownOpen = !dropdownOpen" class="items-center block w-full space-x-2 focus:outline-none">
+                                <span class="flex items-center justify-between">
+                                    <span class="flex space-x-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        <span>Dropdown</span>
+                                    </span>
+
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button> 
+                            <div class="mt-2 ml-5" x-show="dropdownOpen" x-transition>
+                                <ul class="ml-1 space-y-1">
+                                    <a href="" class="block p-px hover:bg-gray-300">Item 1</a>                                
+                                    <a href="" class="block p-px hover:bg-gray-300">Item 2</a>                                
+                                    <a href="" class="block p-px hover:bg-gray-300">Item 2 </a>                                
+                                </ul>    
+                            </div>          
+
+                        </li>
+                        
+                    </ul>
+                </div>
+
+                <div class="mt-8 text-sm ">
+                    <h2 class="font-bold">Menu 2</h2>
+                    <ul class="flex flex-col mt-2 space-y-2 text-gray-600">
+                        <a class="flex items-center px-2 py-1 space-x-2 font-medium text-gray-800 bg-gray-300 rounded"
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Dashboard</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>About</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Contact Us</span>                        
+                        </a>
+                        
+                    </ul>
+                </div>
+                <div class="mt-8 text-sm ">
+                    <h2 class="font-bold">Menu 2</h2>
+                    <ul class="flex flex-col mt-2 space-y-2 text-gray-600">
+                        <a class="flex items-center px-2 py-1 space-x-2 font-medium text-gray-800 bg-gray-300 rounded"
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Dashboard</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>About</span>                        
+                        </a>
+                        <a class="flex items-center px-2 py-1 space-x-2 hover:text-gray-700 "
+                        href="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Contact Us</span>                        
+                        </a>
+                        
+                    </ul>
+                </div>
+               
+                
+            </div>
+        </aside> <!--End of side bar-->
+
+        <main class="my-10 lg:ml-48">
+            <div class="p-10">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="p-5 rounded shadow-lg bg-gray-50">
+                        <div class="flex items-center space-x-6">
+                            <span class="p-4 bg-yellow-400 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h2 class="text-xs font-semibold text-gray-500">TODAY'S TOTAL</h2>              
+                                <h3 class="mt-3 text-3xl font-bold text-gray-700">177.85</h3>
+                                <div class="flex items-center mt-3 space-x-2">
+                                    <div class="flex items-center space-x-1 text-sm text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 " viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span class="">24.6%</span>
+                                    </div>
+                                    <p class="text-sm"> less earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 rounded shadow-lg bg-gray-50">
+                        <div class="flex items-center space-x-6">
+                            <span class="p-4 bg-yellow-400 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h2 class="text-xs font-semibold text-gray-500">TODAY'S TOTAL</h2>              
+                                <h3 class="mt-3 text-3xl font-bold text-gray-700">177.85</h3>
+                                <div class="flex items-center mt-3 space-x-2">
+                                    <div class="flex items-center space-x-1 text-sm text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 " viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span class="">24.6%</span>
+                                    </div>
+                                    <p class="text-sm"> less earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 rounded shadow-lg bg-gray-50">
+                        <div class="flex items-center space-x-6">
+                            <span class="p-4 bg-yellow-400 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h2 class="text-xs font-semibold text-gray-500">TODAY'S TOTAL</h2>              
+                                <h3 class="mt-3 text-3xl font-bold text-gray-700">177.85</h3>
+                                <div class="flex items-center mt-3 space-x-2">
+                                    <div class="flex items-center space-x-1 text-sm text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 " viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span class="">24.6%</span>
+                                    </div>
+                                    <p class="text-sm"> less earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 rounded shadow-lg bg-gray-50">
+                        <div class="flex items-center space-x-6">
+                            <span class="p-4 bg-yellow-400 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h2 class="text-xs font-semibold text-gray-500">TODAY'S TOTAL</h2>              
+                                <h3 class="mt-3 text-3xl font-bold text-gray-700">177.85</h3>
+                                <div class="flex items-center mt-3 space-x-2">
+                                    <div class="flex items-center space-x-1 text-sm text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 " viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span class="">24.6%</span>
+                                    </div>
+                                    <p class="text-sm"> less earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- This is the Table -->
+            <div class="mx-10 my-12">
+                <div class="flex justify-between">                    
+                    <h2 class="text-2xl font-medium">Tables</h2>
+                    <div class="">
+                        <a href=""
+                            class="px-8 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none">
+                            Add 
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex flex-col">
+                        <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6">
+                            <div
+                                    class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-right text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Name
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Title
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Title
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Title
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Status
+                                        </th>
+                                        <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                            style="text-align: start">
+                                            Role
+                                        </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 w-10 h-10">
+                                                    <img class="w-10 h-10 rounded-full"
+                                                         src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                         alt=""/>
+                                                </div>
+                                                <div class="mx-2">
+                                                    <div class="text-sm font-medium leading-5 text-gray-900">Jone Doe</div>
+                                                    <div class="text-sm leading-5 text-gray-500">bernardlane@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Software Engineer
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Software Engineer
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Software Engineer
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                          <span
+                                                  class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Active
+                                          </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                            Owner
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 w-10 h-10">
+                                                    <img class="w-10 h-10 rounded-full"
+                                                         src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                         alt=""/>
+                                                </div>
+                                                <div class="mx-2">
+                                                    <div class="text-sm font-medium leading-5 text-gray-900">Jone Doe</div>
+                                                    <div class="text-sm leading-5 text-gray-500">bernardlane@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Actor
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Actor
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                            Actor
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                          <span
+                                                  class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Active
+                                          </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                            Owner
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- form here -->
+
+            <div class="flex items-center min-h-screen">
+                <div class="w-full max-w-lg mx-auto overflow-hidden bg-white rounded-lg shadow">
+                    <div class="px-6 py-4">
+                        <div class="text-3xl font-bold text-center text-gray-700">Checkin</div>
+                        <div class="mt-1 text-xl font-bold text-center text-gray-600">Welcome Back</div>
+                        <div class="mt-1 text-center text-gray-600">Adding new Vehicle</div>
+                        <form action="" method="POST">
+                           
+                            <div class="w-full mt-4">
+                                <label class="text-gray-600" for="name">Name</label>
+                                <input type="text" name="vehicle_no" placeholder="vehicle number"
+                                       class="block w-full px-4 py-3 mt-2 text-gray-700 placeholder-gray-500 bg-gray-100 border border-gray-300 rounded appearance-none focus:outline-none focus:bg-white"/>
+                                
+                                <p class="mt-4 text-xs text-red-500">
+                                    <!-- message -->
+                                </p>
+                                
+                            </div>
+                            <div class="w-full mt-4">
+                                <label class="text-gray-600" for="name">Number</label>
+                                <input type="text" name="consignmentno" readonly
+                                        value=""
+                                       class="block w-full px-4 py-3 mt-2 text-gray-700 placeholder-gray-500 bg-gray-100 border border-gray-300 rounded appearance-none focus:outline-none focus:bg-white"/>
+                                
+                                <p class="mt-4 text-xs text-red-500">
+                                   <!-- message -->
+                                </p>
+                                
+                            </div>
+
+                            <div class="w-full mt-4">
+                                <label class="text-sm text-gray-600" for="name">Number</label>
+                                <input type="search" name="" id=""
+                                    class="w-full px-4 py-2 text-sm text-gray-700 placeholder-gray-500 bg-gray-100 border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-gray-500 focus:bg-white"
+                                    placeholder="Search..."
+                                > 
+                                <p class="mt-4 text-xs text-red-500">
+                                   <!-- message -->
+                                </p>
+                                
+                            </div>
+        
+                            <div class="mt-6 ">
+                                <button type="submit"
+                                        class="px-8 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none">
+                                    Save
+                                </button>
+                            </div>
+                            <div class="mt-6 ">
+                                <button 
+                                    role="button"
+                                    class="px-8 py-2 text-sm font-medium text-gray-100 bg-gray-800 rounded-md hover:bg-gray-600">
+                                    Search
+                                </button> 
+                            </div>
+
+
+                          
+                        </form>
+                    </div>
+        
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center min-h-screen px-5 py-5 bg-gray-200 min-w-screen">
+                <div class="w-full max-w-3xl">
+                  <div class="-mx-2 md:flex">
+                    <div class="w-full px-2 md:w-1/3">
+                      <div class="mb-4 rounded-lg shadow-sm">
+                        <div class="relative bg-white rounded-lg shadow-lg md:shadow-xl overflow:hidden">
+                          <div class="relative z-10 px-3 pt-8 pb-10 text-center">
+                            <h4 class="text-sm leading-tight text-gray-500 uppercase">
+                              Followers
+                            </h4>
+                            <h3 class="my-3 text-3xl font-semibold leading-tight text-gray-700">
+                              13,579
+                            </h3>
+                            <p class="text-xs leading-tight text-green-500">
+                              🔺 40.9%
+                            </p>
+                          </div>
+                          <div class="absolute inset-x-0 bottom-0">
+                            <canvas id="chart1" height="70"></canvas>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+
+            <div>
+                
+            </div>
+
+
+        </main> <!--End of the main-->
+
+        
+        <!-- This is a model -->
+        <div class="absolute flex items-center justify-center hidden w-full top-20">
+            <button @click="" class="fixed inset-0 w-full h-full bg-gray-900 opacity-50"></button>
+
+            <div class="relative max-w-xl mx-4 mb-20 bg-white rounded-lg lg:max-w-2xl">
+                <div class="p-4 pb-8">
+                    <!-- content from here -->
+                    <div class="flex justify-end rounded grow-1">
+                        <div>X</div>
+                    </div>
+                    <h2 class="text-lg font-medium tracking-wide text-center text-gray-700 underline">THIS IS THE HEADING</h2>
+    
+                    <div class="mt-6 text-gray-500">
+                        <p>Lorem ipsum dolor sit amet consectetur som gibrish hhhhhh </p>
+                        <p>Lorem ipsum dolor sit amet consectetur som gibrish </p>
+                        <p>Lorem ipsum dolor sit  </p>
+                        <p>Lorem ipsum dolor sit amet consectetur som gibrish </p>
+                    </div>
+
+                    <div class="mt-6 ">
+                        <button type="submit"
+                                class="px-8 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 focus:outline-none">
+                            Save
+                        </button>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+       
+
+
+
+
+        <div class="fixed bottom-0 w-full bg-gray-300 border lg:left-48">
+            <div class="flex justify-center text-sm lg:justify-start ">
+                <p class="mr-6">&copy;mysite.com </p> |
+                <p class="ml-6"> powered by directyl.com</p>
+            </div>
+        </div>
+
+  
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+
+    <script>
+        const chartOptions = {
+        maintainAspectRation: false,
+        legend: {
+          display: false
+        },
+        tooltips: {
+          enable: false
+        },
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        scales: {
+          xAxes: [
+            {
+              gridLines: false,
+              scaleLabel: false,
+              ticks: {
+                display: false
+              }
+            }
+          ],
+          yAxes: [
+            {
+              gridLines: false,
+              scaleLabel: false,
+              ticks: {
+                display: false,
+                suggestedMin: 0,
+                suggestedMax: 10
+              }
+            }
+          ]
+        }
+      };
+
+      var ctx = document.getElementById("chart1").getContext("2d");
+      var chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [1, 2, 1, 3, 5, 4, 7],
+          datasets: [
+            {
+              backgroundColor: "rgba(101, 116, 205, 0.1)",
+              borderColor: "rgba(101, 116, 205, 0.8)",
+              borderWidth: 2,
+              data: [1, 2, 1, 3, 5, 4, 7]
+            }
+          ]
+        },
+        options: chartOptions
+      });
+</script>
+
+</body>
+</html>
